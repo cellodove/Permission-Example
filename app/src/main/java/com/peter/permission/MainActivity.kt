@@ -1,11 +1,13 @@
 package com.peter.permission
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.peter.permission.databinding.ActivityMainBinding
 
@@ -16,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         if (checkPermission()) {
-
+            Toast.makeText(this,"권한 허용 완료",Toast.LENGTH_SHORT).show()
         }else{
             if (checkDeniedPermission()){
                 supportFragmentManager.beginTransaction()
@@ -24,29 +26,21 @@ class MainActivity : AppCompatActivity() {
                     .add(R.id.container, IntroPermissionFragment())
                     .commit()
             }else{
-
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(
-                    Uri.parse("package:$packageName"))
-                startActivity(intent)
-
-
-/*
-                CommonDialog.getInstance(
-                    isImgVisible = true,
-                    title = getString(R.string.permission_request_title),
-                    msg = getString(R.string.permission_request_sub_title),
-                    rightBtnText = getString(R.string.confirm),
-                    leftBtnText = getString(R.string.cancel),
-                    onLeftClick = {
-                        finish()
-                    },
-                    onRightClick = {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(
-                            Uri.parse("package:$packageName"))
+                val dialog = AlertDialog.Builder(this)
+                dialog.apply {
+                    title = "권한 설정"
+                    setMessage("권한 설정을 하시겠습니까?")
+                    setPositiveButton("확인"
+                    ) { _, _ ->
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.parse("package:$packageName"))
                         startActivity(intent)
                     }
-                ).show(supportFragmentManager.beginTransaction(),"")
-*/
+                    setNegativeButton("취소"){
+                        _,_ ->
+                        UInt
+                    }
+                }
+                dialog.create().show()
 
             }
         }

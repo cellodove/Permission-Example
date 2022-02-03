@@ -39,46 +39,40 @@ class IntroPermissionFragment : Fragment() {
         }.map {
             it.key
         }
-        if (result.none { !it.value }) {
-            val intent = Intent(requireContext(), MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-            requireActivity().finishAffinity()
-        } else {
-            when {
-                deniedList.isNotEmpty() -> {
-                    val map = deniedList.groupBy { permission ->
-                        if (shouldShowRequestPermissionRationale(permission)) "DENIED" else "EXPLAINED"
-                    }
-                    map["DENIED"]?.let {
-                        // 거부 한 번 했을경우 재요청
-                        val intent = Intent(requireContext(), MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        startActivity(intent)
-                        requireActivity().finishAffinity()
-                    }
-                    map["EXPLAINED"]?.let {
-                        // 거부 두 번 했을경우 설정
-                        val dialog = AlertDialog.Builder(requireContext())
-                        dialog.apply {
-                            setMessage("권한 설정을 하시겠습니까?")
-                            setPositiveButton("확인"
-                            ) { _, _ ->
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(
-                                    Uri.parse("package:${requireContext().packageName}"))
-                                startActivity(intent)
-                            }
-                            setNegativeButton("취소"){
-                                    _,_ ->
-                                UInt
-                            }
+
+        when {
+            deniedList.isNotEmpty() -> {
+                val map = deniedList.groupBy { permission ->
+                    if (shouldShowRequestPermissionRationale(permission)) "DENIED" else "EXPLAINED"
+                }
+                map["DENIED"]?.let {
+                    // 거부 한 번 했을경우 재요청
+                    val intent = Intent(requireContext(), MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    startActivity(intent)
+                    requireActivity().finishAffinity()
+                }
+                map["EXPLAINED"]?.let {
+                    // 거부 두 번 했을경우 설정
+                    val dialog = AlertDialog.Builder(requireContext())
+                    dialog.apply {
+                        setMessage("권한 설정을 하시겠습니까?")
+                        setPositiveButton("확인"
+                        ) { _, _ ->
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(
+                                Uri.parse("package:${requireContext().packageName}"))
+                            startActivity(intent)
                         }
-                        dialog.create().show()
+                        setNegativeButton("취소"){
+                                _,_ ->
+                            UInt
+                        }
                     }
+                    dialog.create().show()
                 }
-                else -> {
-                    // All request are permitted
-                }
+            }
+            else -> {
+                // All request are permitted
             }
         }
     }
